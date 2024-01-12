@@ -5,20 +5,23 @@ import { TodoItemType, TodoStateEnum } from "./types";
 import TodosItem from "./components/TodosItem";
 import InputTodoTile from "./components/InputTodoTile";
 
-const backendUrl = "http://localhost:8000";
+const HOST = import.meta.env.VITE_HOST;
+const protocol = "http";
+const PORT = import.meta.env.VITE_PORT;
+const BASE_URL = `${protocol}://${HOST}:${PORT}`;
 
 export default function App() {
   const [todosItems, setTodosItems] = useState<TodoItemType[]>([]);
   const [apiAvailability, setApiAvailability] = useState<boolean>(false);
 
   async function performHealthCheck() {
-    const healthCheck = await axios.get(backendUrl + "/healthcheck");
+    const healthCheck = await axios.get(BASE_URL + "/healthcheck");
     if (healthCheck.status === 200) {
       setApiAvailability(true);
     }
   }
   async function fetchTodos() {
-    const todos = await axios.get(backendUrl + "/api/todos");
+    const todos = await axios.get(BASE_URL + "/api/todos");
     setTodosItems(todos.data);
   }
 

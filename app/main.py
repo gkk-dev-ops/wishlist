@@ -18,6 +18,8 @@ def get_db():
 
 
 models.Base.metadata.create_all(bind=engine)
+
+wasRecentlyDeleted = []
 app = FastAPI()
 
 ALLOWED_ORIGINS = json.loads(os.environ.get(
@@ -29,101 +31,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# todosItems = [
-#     {
-#         "title": "Pobierz 13 posterunek",
-#         "description": "Pobierz na jellyfin",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz pingwiny z Madagaskaru",
-#         "description": "Pobierz na jellyfin",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz the good plays",
-#         "description": "",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz Lucyfera",
-#         "description": "",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz Edd Sheeran",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz j Kaczmarski",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz kolędy",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Povierz Marek Grechuta",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         'state': schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz Koen",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz autora - Lemon tree",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Pobierz Chriss de Barg",
-#         "description": "",
-#         "tags": ["music", "finamp"],
-#         "state": schemas.TodoStateEnum.new,
-#     },
-#     {
-#         "title": "Znajdź i pobierz Utopia",
-#         "description": "https://www.stan.com.au/watch/utopia-2014",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.wip,
-#     },
-#     {
-#         "title": "Pobierz z yt",
-#         "description": """Kllier - https://www.youtube.com/watch?v=VfYhB3pwO_w
-#           Killerów 2óch - https://www.youtube.com/watch?v=wDhifelpwps""",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.done,
-#     },
-#     {
-#         "title": "Pobierz Friends (en)",
-#         "description": "[znajdź skąd ]",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.wont,
-#     },
-#     {
-#         "title": "Pobierz Vinci",
-#         "description": "",
-#         "tags": ["watch", "jellyfin"],
-#         "state": schemas.TodoStateEnum.wont,
-#     },
-# ]
 
 
 @app.get("/healthcheck")
@@ -145,8 +52,11 @@ def get_todo_items(todo_item: schemas.CreateTodoItem, db: SessionLocal = Depends
 def remove_todo_item(todo_id: UUID, db: SessionLocal = Depends(get_db)):
     todo_item_to_be_removed = crud.find_todo_item(
         todo_id=todo_id, db=db)
-    if not todo_item_to_be_removed:
+    if not todo_item_to_be_removed and wasRecentlyDeleted:
         return Response(status_code=204)
+    elif not todo_item_to_be_removed and not wasRecentlyDeleted:
+        raise HTTPException(
+            status_code=404, detail="Todo item with this id does not exist")
     return crud.remove_todo_item(db, todo_id)
 
 
@@ -161,3 +71,5 @@ def update_todo_item(todo_item: schemas.TodoItem, db: SessionLocal = Depends(get
 
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True))
+if os.path.exists("./frontend/dist"):
+    app.mount("/", StaticFiles(directory="./frontend/dist", html=True))
