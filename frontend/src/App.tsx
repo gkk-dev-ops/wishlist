@@ -66,6 +66,7 @@ export default function App() {
           )}
           {fitleredTodos(TodoStateEnum.new).length ? (
             <TodosItem
+              fetchTodos={fetchTodos}
               deleteTodoItem={(todoId: string) => {
                 deleteTodoItem(todoId);
                 fetchTodos();
@@ -83,6 +84,7 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.wip).length ? (
             <TodosItem
+              fetchTodos={fetchTodos}
               deleteTodoItem={(todoId: string) => {
                 deleteTodoItem(todoId);
                 fetchTodos();
@@ -100,6 +102,7 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.wont).length ? (
             <TodosItem
+              fetchTodos={fetchTodos}
               deleteTodoItem={(todoId: string) => {
                 deleteTodoItem(todoId);
                 fetchTodos();
@@ -117,6 +120,7 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.done).length ? (
             <TodosItem
+              fetchTodos={fetchTodos}
               deleteTodoItem={(todoId: string) => {
                 deleteTodoItem(todoId);
                 fetchTodos();

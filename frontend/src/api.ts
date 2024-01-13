@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BuildTodoItemType, TodoStateEnum } from "./types";
+import { BuildTodoItemType, TodoItemType, TodoStateEnum } from "./types";
 
 export const HOST = import.meta.env.VITE_HOST;
 export const protocol = "http";
@@ -16,5 +16,15 @@ export function postTodoItem(todo: BuildTodoItemType) {
     description: todo.description,
     tags: todo.tags,
     state: TodoStateEnum.new,
+  });
+}
+
+export function updateTodoItem(todo: TodoItemType) {
+  axios.put(`${BASE_URL}/api/todo`, {
+    id: todo.id,
+    title: todo.title,
+    description: todo.description,
+    tags: todo.tags,
+    state: todo.state,
   });
 }

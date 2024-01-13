@@ -1,20 +1,21 @@
 import { TodoItemType, TodoStateEnum } from "../types";
-import TrashBinIcon from "../assets/trashbin.svg";
-import TrashBinIconDark from "../assets/trashbin-dark.svg";
-import { useState } from "react";
-import { classNames, isDarkThemePreferred } from "../utils/utils";
+import { FC, useState } from "react";
+import { classNames } from "../utils/utils";
+import TodoCardButtons from "./TodoCardButton";
 
-type TodosItemProps = {
+type props = {
+  fetchTodos: () => void;
   deleteTodoItem: (todoId: string) => void;
   todosItems: TodoItemType[];
   desiredState: TodoStateEnum;
 };
 
-export default function TodosItem({
+const TodosItem: FC<props> = ({
   deleteTodoItem,
   todosItems,
   desiredState,
-}: TodosItemProps) {
+  fetchTodos,
+}) => {
   const [isBeingDeleted, setIsBeingDeleted] = useState("");
   return todosItems
     .filter((todos) => todos.state === desiredState)
@@ -30,23 +31,13 @@ export default function TodosItem({
           key={`${todo.title}-${todo.description}-${todosItems.length}}`}
         >
           <div className="flex w-full justify-between">
-            <p>{todo.title}</p>
-            <div
-              className="min-w-5 cursor-pointer rounded p-1 hover:bg-accent-100"
-              onClick={() => {
-                setIsBeingDeleted(todo.id);
-                setTimeout(() => {
-                  setIsBeingDeleted(todo.id);
-                }, 2000);
-                deleteTodoItem(todo.id);
-              }}
-            >
-              <img
-                className="h-4 w-4"
-                src={isDarkThemePreferred() ? TrashBinIconDark : TrashBinIcon}
-                alt="delete"
-              />
-            </div>
+            <p className="w-full">{todo.title}</p>
+            <TodoCardButtons
+              fetchTodos={fetchTodos}
+              todo={todo}
+              setIsBeingDeleted={setIsBeingDeleted}
+              deleteTodoItem={deleteTodoItem}
+            />
           </div>
           <p className="text-wrap font-light">{todo.description}</p>
           <p className="mt-1 w-full text-wrap text-right text-xs font-light"></p>
@@ -60,4 +51,6 @@ export default function TodosItem({
         </div>
       );
     });
-}
+};
+
+export default TodosItem;
