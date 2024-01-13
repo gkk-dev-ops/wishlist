@@ -16,6 +16,8 @@ export default function App() {
     const healthCheck = await axios.get(BASE_URL + "/healthcheck");
     if (healthCheck.status === 200) {
       setApiAvailability(true);
+    } else {
+      setApiAvailability(false);
     }
   }
   async function fetchTodos() {
@@ -44,10 +46,18 @@ export default function App() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-screen-lg	flex-col items-center dark:text-base-light">
-      <div className="mt-16 flex flex-col items-center justify-center gap-2 text-center text-accent-200 dark:text-accent-100">
-        <p className="text-2xl">What media, features do you</p>
-        <p className="text-6xl">Wish?</p>
-      </div>
+      {apiAvailability ? (
+        <div className="mt-16 flex flex-col items-center justify-center gap-2 text-center text-accent-200 dark:text-accent-100">
+          <p className="text-2xl">What media, features do you</p>
+          <p className="text-6xl">Wish?</p>
+        </div>
+      ) : (
+        <div className="mt-16 flex flex-col items-center justify-center gap-2 text-center text-accent-200 dark:text-accent-100">
+          <img src="http://staticassets.wronet/fire.svg" />
+          <p className="text-2xl">Contact administrator</p>
+          <p className="text-6xl">Something went wrong</p>
+        </div>
+      )}
       <div className="mt-14 flex flex-row flex-wrap justify-center gap-4">
         <div className="flex w-60 flex-col gap-4 text-center">
           <div className="min-h-14">
