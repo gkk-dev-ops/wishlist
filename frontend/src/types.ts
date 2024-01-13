@@ -1,8 +1,15 @@
 export type TodoItemType = {
+  id: string;
   title: string;
   description: string;
   tags: string[];
   state: TodoStateEnum;
+};
+
+export type BuildTodoItemType = {
+  title: string;
+  description: string;
+  tags: string[];
 };
 
 export enum TodoStateEnum {

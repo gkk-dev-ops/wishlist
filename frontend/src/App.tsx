@@ -4,15 +4,13 @@ import { useState } from "react";
 import { TodoItemType, TodoStateEnum } from "./types";
 import TodosItem from "./components/TodosItem";
 import InputTodoTile from "./components/InputTodoTile";
-
-const HOST = import.meta.env.VITE_HOST;
-const protocol = "http";
-const PORT = import.meta.env.VITE_PORT;
-const BASE_URL = `${protocol}://${HOST}:${PORT}`;
+import { BASE_URL, deleteTodoItem, postTodoItem } from "./api";
+import LoadingTodoItem from "./components/LoadingTodoItem";
 
 export default function App() {
   const [todosItems, setTodosItems] = useState<TodoItemType[]>([]);
   const [apiAvailability, setApiAvailability] = useState<boolean>(false);
+  const [isLoadingTodos, setIsLoadingTodos] = useState(false);
 
   async function performHealthCheck() {
     const healthCheck = await axios.get(BASE_URL + "/healthcheck");
@@ -21,8 +19,13 @@ export default function App() {
     }
   }
   async function fetchTodos() {
-    const todos = await axios.get(BASE_URL + "/api/todos");
-    setTodosItems(todos.data);
+    setIsLoadingTodos(true);
+    console.log("fetching new todos");
+    setTimeout(async () => {
+      const todos = await axios.get(BASE_URL + "/api/todos");
+      setTodosItems(todos.data);
+      setIsLoadingTodos(false);
+    }, 1500);
   }
 
   useEffect(() => {
@@ -51,9 +54,22 @@ export default function App() {
             <p className="text-2xl">Add new:</p>
             <p className="font-light">And why</p>
           </div>
-          <InputTodoTile />
+          {isLoadingTodos ? (
+            <LoadingTodoItem />
+          ) : (
+            <InputTodoTile
+              postTodoItem={(todo) => {
+                postTodoItem(todo);
+                fetchTodos();
+              }}
+            />
+          )}
           {fitleredTodos(TodoStateEnum.new).length ? (
             <TodosItem
+              deleteTodoItem={(todoId: string) => {
+                deleteTodoItem(todoId);
+                fetchTodos();
+              }}
               todosItems={todosItems}
               desiredState={TodoStateEnum.new}
             />
@@ -67,6 +83,10 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.wip).length ? (
             <TodosItem
+              deleteTodoItem={(todoId: string) => {
+                deleteTodoItem(todoId);
+                fetchTodos();
+              }}
               todosItems={todosItems}
               desiredState={TodoStateEnum.wip}
             />
@@ -80,6 +100,10 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.wont).length ? (
             <TodosItem
+              deleteTodoItem={(todoId: string) => {
+                deleteTodoItem(todoId);
+                fetchTodos();
+              }}
               todosItems={todosItems}
               desiredState={TodoStateEnum.wont}
             />
@@ -93,6 +117,10 @@ export default function App() {
           </div>
           {fitleredTodos(TodoStateEnum.done).length ? (
             <TodosItem
+              deleteTodoItem={(todoId: string) => {
+                deleteTodoItem(todoId);
+                fetchTodos();
+              }}
               todosItems={todosItems}
               desiredState={TodoStateEnum.done}
             />

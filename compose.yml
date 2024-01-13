@@ -12,5 +12,5 @@ services:
       - "8005:8005"
     volumes:
       - ./app/persistant:/app/persistant
-    environment:
-      - ALLOWED_ORIGINS=["http://localhost:8005"]
+    # environment:
+    #   - ALLOWED_ORIGINS=["http://localhost:*"]
