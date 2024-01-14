@@ -2,10 +2,9 @@ import { useEffect } from "react";
 import axios from "axios";
 import { useState } from "react";
 import { TodoItemType, TodoStateEnum } from "./types";
-import TodosItem from "./components/TodosItem";
 import InputTodoTile from "./components/InputTodoTile";
 import { BASE_URL, deleteTodoItem, postTodoItem } from "./api";
-import LoadingTodoItem from "./components/LoadingTodoItem";
+import TodoColumn from "./components/TodoColumn";
 
 export default function App() {
   const [todosItems, setTodosItems] = useState<TodoItemType[]>([]);
@@ -40,10 +39,6 @@ export default function App() {
     }
   }, [apiAvailability]);
 
-  function fitleredTodos(state: TodoStateEnum) {
-    return todosItems.filter((todos) => todos.state === state);
-  }
-
   return (
     <main className="mx-auto flex min-h-screen max-w-screen-lg	flex-col items-center dark:text-base-light">
       {apiAvailability ? (
@@ -59,89 +54,70 @@ export default function App() {
         </div>
       )}
       <div className="mt-14 flex flex-row flex-wrap justify-center gap-4">
-        <div className="flex w-60 flex-col gap-4 text-center">
-          <div className="min-h-14">
-            <p className="text-2xl">Add new:</p>
-            <p className="font-light">And why</p>
-          </div>
-          {isLoadingTodos ? (
-            <LoadingTodoItem />
-          ) : (
-            <InputTodoTile
-              postTodoItem={(todo) => {
-                postTodoItem(todo);
-                fetchTodos();
-              }}
-            />
-          )}
-          {fitleredTodos(TodoStateEnum.new).length ? (
-            <TodosItem
-              fetchTodos={fetchTodos}
-              deleteTodoItem={(todoId: string) => {
-                deleteTodoItem(todoId);
-                fetchTodos();
-              }}
-              todosItems={todosItems}
-              desiredState={TodoStateEnum.new}
-            />
-          ) : (
-            <p className="italic">Nothing to do</p>
-          )}
-        </div>
-        <div className="flex w-60 flex-col gap-4 text-center">
-          <div className="min-h-14">
-            <p className="text-2xl">Work in progress</p>
-          </div>
-          {fitleredTodos(TodoStateEnum.wip).length ? (
-            <TodosItem
-              fetchTodos={fetchTodos}
-              deleteTodoItem={(todoId: string) => {
-                deleteTodoItem(todoId);
-                fetchTodos();
-              }}
-              todosItems={todosItems}
-              desiredState={TodoStateEnum.wip}
-            />
-          ) : (
-            <p className="italic">No work is in progress</p>
-          )}
-        </div>
-        <div className="flex w-60 flex-col gap-4 text-center">
-          <div className="min-h-14">
-            <p className="text-2xl">Won&apos;t do</p>
-          </div>
-          {fitleredTodos(TodoStateEnum.wont).length ? (
-            <TodosItem
-              fetchTodos={fetchTodos}
-              deleteTodoItem={(todoId: string) => {
-                deleteTodoItem(todoId);
-                fetchTodos();
-              }}
-              todosItems={todosItems}
-              desiredState={TodoStateEnum.wont}
-            />
-          ) : (
-            <p className="italic">Nothing is impossible to do</p>
-          )}
-        </div>
-        <div className="flex w-60 flex-col gap-4 text-center">
-          <div className="min-h-14">
-            <p className="text-2xl">Done</p>
-          </div>
-          {fitleredTodos(TodoStateEnum.done).length ? (
-            <TodosItem
-              fetchTodos={fetchTodos}
-              deleteTodoItem={(todoId: string) => {
-                deleteTodoItem(todoId);
-                fetchTodos();
-              }}
-              todosItems={todosItems}
-              desiredState={TodoStateEnum.done}
-            />
-          ) : (
-            <p className="italic">Nothing was done</p>
-          )}
-        </div>
+        <TodoColumn
+          todosItems={todosItems}
+          deleteTodoItem={(todoId: string) => {
+            deleteTodoItem(todoId);
+            fetchTodos();
+          }}
+          isLoadingTodos={isLoadingTodos}
+          fetchTodos={fetchTodos}
+          columnState={TodoStateEnum.new}
+          columnLabels={{
+            empty: "No new ideas",
+            title: "Add new:",
+            subtile: "And why",
+          }}
+        >
+          <InputTodoTile
+            postTodoItem={(todo) => {
+              postTodoItem(todo);
+              fetchTodos();
+            }}
+          />
+        </TodoColumn>
+        <TodoColumn
+          todosItems={todosItems}
+          deleteTodoItem={(todoId: string) => {
+            deleteTodoItem(todoId);
+            fetchTodos();
+          }}
+          isLoadingTodos={isLoadingTodos}
+          fetchTodos={fetchTodos}
+          columnState={TodoStateEnum.wip}
+          columnLabels={{
+            empty: "No work is in progress",
+            title: "Work in progress",
+          }}
+        />
+        <TodoColumn
+          todosItems={todosItems}
+          deleteTodoItem={(todoId: string) => {
+            deleteTodoItem(todoId);
+            fetchTodos();
+          }}
+          isLoadingTodos={isLoadingTodos}
+          fetchTodos={fetchTodos}
+          columnState={TodoStateEnum.wont}
+          columnLabels={{
+            empty: "Nothing is impossible to do",
+            title: "Won&apos;t do",
+          }}
+        />
+        <TodoColumn
+          todosItems={todosItems}
+          deleteTodoItem={(todoId: string) => {
+            deleteTodoItem(todoId);
+            fetchTodos();
+          }}
+          isLoadingTodos={isLoadingTodos}
+          fetchTodos={fetchTodos}
+          columnState={TodoStateEnum.done}
+          columnLabels={{
+            empty: "Nothing was done",
+            title: "Done",
+          }}
+        />
       </div>
     </main>
   );
